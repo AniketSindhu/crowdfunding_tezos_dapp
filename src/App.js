@@ -4,6 +4,7 @@ import { useState } from "react";
 import { TezosToolkit } from "@taquito/taquito";
 import DisconnectButton from "./components/Wallet/DisconnectButton";
 import ConnectButton from "./components/Wallet/ConnectButton";
+import AddProject from "./components/AddProject";
 
 function App() {
   const [Tezos, setTezos] = useState(
@@ -13,6 +14,16 @@ function App() {
   const [userAddress, setUserAddress] = useState("");
   const [userBalance, setUserBalance] = useState(0);
   const [beaconConnection, setBeaconConnection] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = (value) => {
+    setOpen(false);
+  };
+
   return (
     <div className="App">
       <h1 style={{ fontSize: "38px" }}>Crowdfunding</h1>
@@ -33,7 +44,7 @@ function App() {
             cursor: "pointer",
           }}
         >
-          <div style={{ margin: "4px" }}>
+          <div style={{ margin: "4px" }} onClick={handleClickOpen}>
             <b>Start A Project</b>
           </div>
         </button>
@@ -73,6 +84,7 @@ function App() {
       <ProjectOngoing />
       <ProjectOngoing />
       <ProjectOngoing />
+      <AddProject open={open} handleClose={handleClose} />
     </div>
   );
 }

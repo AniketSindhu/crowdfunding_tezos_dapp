@@ -39,7 +39,7 @@ function ConnectButton({
       console.log("Called");
       // creates a wallet instance
       const options = {
-        name: "Crpwdfunding Dapp",
+        name: "Crowdfunding Dapp",
         iconUrl: "https://tezostaquito.io/img/favicon.png",
         preferredNetwork: "granadanet",
       };
