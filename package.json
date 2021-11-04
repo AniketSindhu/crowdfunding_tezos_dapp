@@ -5,6 +5,7 @@
   "dependencies": {
     "@emotion/react": "^11.5.0",
     "@emotion/styled": "^11.3.0",
+    "@mui/lab": "*",
     "@mui/material": "^5.0.6",
     "@ramonak/react-progress-bar": "^4.0.0",
     "@taquito/beacon-wallet": "^10.2.1",

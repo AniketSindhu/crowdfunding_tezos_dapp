@@ -36,6 +36,7 @@ function App() {
         }}
       >
         <button
+          onClick={handleClickOpen}
           style={{
             margin: "20px 10px 10px 10px",
             backgroundColor: "#1976D2",
@@ -44,7 +45,7 @@ function App() {
             cursor: "pointer",
           }}
         >
-          <div style={{ margin: "4px" }} onClick={handleClickOpen}>
+          <div style={{ margin: "4px" }}>
             <b>Start A Project</b>
           </div>
         </button>
