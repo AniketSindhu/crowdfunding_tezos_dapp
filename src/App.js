@@ -1,10 +1,12 @@
 import "./App.css";
 import ProjectOngoing from "./components/ProjectOngoing";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TezosToolkit } from "@taquito/taquito";
 import DisconnectButton from "./components/Wallet/DisconnectButton";
 import ConnectButton from "./components/Wallet/ConnectButton";
 import AddProject from "./components/AddProject";
+import axios from "axios";
+import config from "./config/config";
 
 function App() {
   const [Tezos, setTezos] = useState(
@@ -15,7 +17,8 @@ function App() {
   const [userBalance, setUserBalance] = useState(0);
   const [beaconConnection, setBeaconConnection] = useState(false);
   const [open, setOpen] = useState(false);
-
+  const [loading, setLoading] = useState(true);
+  const [projects, setProjects] = useState([]);
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -24,10 +27,29 @@ function App() {
     setOpen(false);
   };
 
+  const getProjects = () => {
+    axios.get(`${config.API_URL}/storage`).then((res) => {
+      setProjects(
+        Object.keys(res.data).map((key) => {
+          return {
+            address: key,
+            data: res.data[key],
+          };
+        })
+      );
+
+      setLoading(false);
+    });
+  };
+
+  useEffect(() => {
+    getProjects();
+  }, []);
+
   return (
     <div className="App">
       <h1 style={{ fontSize: "38px" }}>Crowdfunding</h1>
-      <body>Crowdfuning DApp on Tezos Blockchain</body>
+      <p>Crowdfuning DApp on Tezos Blockchain</p>
       <div
         style={{
           display: "flex",
@@ -71,7 +93,6 @@ function App() {
           />
         )}
       </div>
-
       <h1
         style={{
           display: "flex",
@@ -81,10 +102,10 @@ function App() {
       >
         Projects
       </h1>
-      <ProjectOngoing />
-      <ProjectOngoing />
-      <ProjectOngoing />
-      <ProjectOngoing />
+      {projects.map((project) => (
+        <ProjectOngoing projectDetails={project} />
+      ))}
+      ,
       <AddProject open={open} handleClose={handleClose} />
     </div>
   );

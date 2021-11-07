@@ -1,7 +1,7 @@
 import React from "react";
 import ProgressBar from "@ramonak/react-progress-bar";
 
-function ProjectOngoing() {
+function ProjectOngoing({ projectDetails }) {
   return (
     <div
       style={{
@@ -33,14 +33,16 @@ function ProjectOngoing() {
         >
           <div style={{ color: "white", margin: "8px" }}>Ongoing</div>
         </div>
-        <h2 style={{ margin: 0 }}>Sample Project</h2>
+        <h2 style={{ margin: 0 }}>{projectDetails.data.name}</h2>
       </div>
       <div style={{ margin: "10px 0px 10px 0px" }}>
-        Please fund me using tez on tezos blockchain
+        {projectDetails.data.description}
       </div>
-      <div style={{ margin: "10px 0px 10px 0px" }}>Time: 24th March 2019</div>
+      <div style={{ margin: "10px 0px 10px 0px" }}>
+        Time: {new Date(projectDetails.data.endTime).toUTCString()}
+      </div>
       <div style={{ margin: "10px 0px 15px 0px" }}>
-        Goal of <b>18 Tez</b>
+        Goal of <b>{projectDetails.data.goalAmount / 10 ** 6} Tez</b>
       </div>
       <div style={{ display: "flex", flexDirection: "row" }}>
         <input
