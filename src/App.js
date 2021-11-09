@@ -19,6 +19,7 @@ function App() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [projects, setProjects] = useState([]);
+
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -103,7 +104,7 @@ function App() {
         Projects
       </h1>
       {projects.map((project) => (
-        <ProjectOngoing projectDetails={project} />
+        <ProjectOngoing projectDetails={project} key={project.address} />
       ))}
       ,
       <AddProject open={open} handleClose={handleClose} />

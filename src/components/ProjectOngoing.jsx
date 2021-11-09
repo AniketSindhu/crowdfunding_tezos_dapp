@@ -1,7 +1,29 @@
 import React from "react";
 import ProgressBar from "@ramonak/react-progress-bar";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import config from "../config/config";
 
 function ProjectOngoing({ projectDetails }) {
+  const [projectInfo, setProjectInfo] = useState(null);
+  const [contractBalance, setContractBalance] = useState(0);
+  useEffect(() => {
+    const getProjectInfo = () => {
+      console.log(config.API_URL_Project + projectDetails.address + "/storage");
+      axios
+        .get(config.API_URL_Project + projectDetails.address + "/storage")
+        .then((response) => {
+          setProjectInfo(response.data);
+        });
+      axios
+        .get(config.API_URL_Project + projectDetails.address)
+        .then((response) => {
+          setContractBalance(response.data.balance);
+        });
+    };
+    getProjectInfo();
+  }, [projectDetails.address]);
+
   return (
     <div
       style={{
@@ -74,12 +96,12 @@ function ProjectOngoing({ projectDetails }) {
       >
         <b>0 Tez</b>
         <ProgressBar
-          completed={60}
+          completed={(contractBalance / projectDetails.data.goalAmount) * 100}
           margin="10px"
-          width="60rem"
+          width="55rem"
           bgColor="#1976D2"
         />
-        <b>20 Tez</b>
+        <b>{projectDetails.data.goalAmount / 10 ** 6} Tez</b>
       </div>
     </div>
   );
