@@ -40,7 +40,7 @@ class Crowdfunding(sp.Contract):
     
         
     @sp.entry_point
-    def add_project(self, goalAmount, endTime, name, description):
+    def add_project(self, description, endTime, goalAmount, name):
         project_data = sp.local('project_data',sp.record(funding=sp.map(tkey=sp.TAddress, tvalue=None),owner=sp.sender, goalAmount=goalAmount, endTime=endTime, name=name, description=description))
         address = sp.local('address', sp.create_contract(
                 storage = project_data.value,
