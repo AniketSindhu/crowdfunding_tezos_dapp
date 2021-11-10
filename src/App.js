@@ -107,7 +107,7 @@ function App() {
         <ProjectOngoing projectDetails={project} key={project.address} />
       ))}
       ,
-      <AddProject open={open} handleClose={handleClose} />
+      <AddProject Tezos={Tezos} open={open} handleClose={handleClose} />
     </div>
   );
 }

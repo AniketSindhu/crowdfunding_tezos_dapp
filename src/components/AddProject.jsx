@@ -9,11 +9,15 @@ import {
 
 import LoadingButton from "@mui/lab/LoadingButton";
 import { useState } from "react";
-
-function AddProject(props) {
+/**
+ * @param {{Tezos: TezosToolkit}}
+ */
+function AddProject({Tezos, handleClose, open }) {
   const [loading, setloading] = useState(false);
+
+  
   return (
-    <Dialog open={props.open} onClose={props.handleClose} fullWidth>
+    <Dialog open={open} onClose={handleClose} fullWidth>
       <DialogTitle>
         <b>Add Project</b>
       </DialogTitle>
@@ -57,7 +61,7 @@ function AddProject(props) {
           </div>
         </DialogContent>
         <DialogActions>
-          <Button onClick={props.handleClose}>Cancel</Button>
+          <Button onClick={handleClose}>Cancel</Button>
           <LoadingButton
             onClick={() => {
               setloading(true);
