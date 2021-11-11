@@ -3,17 +3,99 @@ import ProgressBar from "@ramonak/react-progress-bar";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import config from "../config/config";
+import LoadingButton from "@mui/lab/LoadingButton";
+import { Chip } from "@mui/material";
 
-function ProjectOngoing({ projectDetails }) {
-  const [projectInfo, setProjectInfo] = useState(null);
+/**
+ * @param {{Tezos: TezosToolkit}}
+ */
+function ProjectOngoing({ projectDetails, Tezos, userAddress }) {
+  const [fundingList, setProjectFunding] = useState(null);
   const [contractBalance, setContractBalance] = useState(0);
+  const [amountToFund, setAmountToFund] = useState(0);
+  const [loading1, setLoading1] = useState(false);
+  const [loading2, setLoading2] = useState(false);
+  const handleAmountToFundChange = (event) => {
+    setAmountToFund(event.target.value);
+  };
+
+  const addFund = () => {
+    setLoading1(true);
+    Tezos.wallet.at(projectDetails.address).then((contract) => {
+      console.log(contract.entrypoints);
+      try {
+        contract.methods
+          .send_fund()
+          .send({ amount: parseFloat(amountToFund) * 10 ** 6, mutez: true })
+          .then((op) => {
+            return op.confirmation();
+          })
+          .then((result) => {
+            if (result.completed) {
+              setLoading1(false);
+              axios
+                .get(config.API_URL_Project + projectDetails.address)
+                .then((response) => {
+                  setContractBalance(response.data.balance);
+                });
+              axios
+                .get(
+                  config.API_URL_Project + projectDetails.address + "/storage"
+                )
+                .then((response) => {
+                  setProjectFunding(response.data.funding);
+                });
+            }
+          });
+      } catch (e) {
+        console.log(e);
+        setLoading1(false);
+      }
+    });
+  };
+
+  const withdraw = () => {
+    setLoading2(true);
+    Tezos.wallet.at(projectDetails.address).then((contract) => {
+      console.log(contract.entrypoints);
+      try {
+        contract.methods
+          .refund()
+          .send()
+          .then((op) => {
+            return op.confirmation();
+          })
+          .then((result) => {
+            if (result.completed) {
+              setLoading2(false);
+              axios
+                .get(config.API_URL_Project + projectDetails.address)
+                .then((response) => {
+                  setContractBalance(response.data.balance);
+                });
+              axios
+                .get(
+                  config.API_URL_Project + projectDetails.address + "/storage"
+                )
+                .then((response) => {
+                  setProjectFunding(response.data.funding);
+                });
+            }
+          });
+      } catch (e) {
+        console.log(e);
+        setLoading2(false);
+      }
+    });
+  };
+
   useEffect(() => {
     const getProjectInfo = () => {
       console.log(config.API_URL_Project + projectDetails.address + "/storage");
       axios
         .get(config.API_URL_Project + projectDetails.address + "/storage")
         .then((response) => {
-          setProjectInfo(response.data);
+          setProjectFunding(response.data.funding);
         });
       axios
         .get(config.API_URL_Project + projectDetails.address)
@@ -46,15 +128,15 @@ function ProjectOngoing({ projectDetails }) {
           alignItems: "center",
         }}
       >
-        <div
+        <Chip
           style={{
             backgroundColor: "#1976D2",
-            width: "fit-content",
             marginRight: "15px",
+            color: "white",
           }}
-        >
-          <div style={{ color: "white", margin: "8px" }}>Ongoing</div>
-        </div>
+          label="Ongoing"
+        />
+
         <h2 style={{ margin: 0 }}>{projectDetails.data.name}</h2>
       </div>
       <div style={{ margin: "10px 0px 10px 0px" }}>
@@ -64,26 +146,41 @@ function ProjectOngoing({ projectDetails }) {
         Time: {new Date(projectDetails.data.endTime).toUTCString()}
       </div>
       <div style={{ margin: "10px 0px 15px 0px" }}>
-        Goal of <b>{projectDetails.data.goalAmount / 10 ** 6} Tez</b>
+        Funded <b>{contractBalance / 10 ** 6} Tez</b> out of goal of{" "}
+        <b>{projectDetails.data.goalAmount / 10 ** 6} Tez</b>
       </div>
+
       <div style={{ display: "flex", flexDirection: "row" }}>
         <input
           type="text"
+          onChange={handleAmountToFundChange}
           placeholder="Amount in Tez"
           style={{ padding: "6px" }}
         />
-        <button
+        <LoadingButton
+          loading={loading1}
+          onClick={addFund}
+          variant="contained"
           style={{
             margin: "0px 10px 0px 10px",
-            backgroundColor: "#1976D2",
-            color: "white",
-            border: "none",
-            cursor: "pointer",
           }}
         >
-          <div style={{ margin: "4px" }}>Fund Project</div>
-        </button>
+          Fund Project
+        </LoadingButton>
+        {fundingList && fundingList.hasOwnProperty(userAddress) && (
+          <LoadingButton
+            loading={loading2}
+            onClick={withdraw}
+            variant="contained"
+            style={{
+              margin: "0px 10px 0px 10px",
+            }}
+          >
+            Withdraw {fundingList[userAddress] / 10 ** 6} Tez
+          </LoadingButton>
+        )}
       </div>
+
       <div
         style={{
           marginTop: "20px",
@@ -97,6 +194,7 @@ function ProjectOngoing({ projectDetails }) {
         <b>0 Tez</b>
         <ProgressBar
           completed={(contractBalance / projectDetails.data.goalAmount) * 100}
+          customLabel={` ${contractBalance / 10 ** 6} Tez`}
           margin="10px"
           width="55rem"
           bgColor="#1976D2"

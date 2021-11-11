@@ -105,7 +105,12 @@ function App() {
         Projects
       </h1>
       {projects.map((project) => (
-        <ProjectOngoing projectDetails={project} key={project.address} />
+        <ProjectOngoing
+          projectDetails={project}
+          key={project.address}
+          Tezos={Tezos}
+          userAddress={userAddress}
+        />
       ))}
       ,
       <AddProject Tezos={Tezos} open={open} handleClose={handleClose} />
