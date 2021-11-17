@@ -7,6 +7,7 @@ import ConnectButton from "./components/Wallet/ConnectButton";
 import AddProject from "./components/AddProject";
 import axios from "axios";
 import config from "./config/config";
+import { Switch, FormControlLabel } from "@mui/material";
 
 function App() {
   const [Tezos, setTezos] = useState(
@@ -19,6 +20,7 @@ function App() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [projects, setProjects] = useState([]);
+  const [checked, setChecked] = useState(false);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -47,6 +49,10 @@ function App() {
   useEffect(() => {
     getProjects();
   }, []);
+
+  const handleChecked = (event) => {
+    setChecked(event.target.checked);
+  };
 
   return (
     <div className="App">
@@ -99,19 +105,35 @@ function App() {
         style={{
           display: "flex",
           flexDirection: "row",
-          justifyContent: "start",
+          justifyContent: "space-between",
         }}
       >
-        Projects
-      </h1>
-      {projects.map((project) => (
-        <ProjectOngoing
-          projectDetails={project}
-          key={project.address}
-          Tezos={Tezos}
-          userAddress={userAddress}
+        Projects{" "}
+        <FormControlLabel
+          control={<Switch checked={checked} onChange={handleChecked} />}
+          label="Show My Projects"
         />
-      ))}
+      </h1>
+      {!checked
+        ? projects.map((project) => (
+            <ProjectOngoing
+              projectDetails={project}
+              key={project.address}
+              Tezos={Tezos}
+              userAddress={userAddress}
+            />
+          ))
+        : projects.map(
+            (project) =>
+              project.data.owner === userAddress && (
+                <ProjectOngoing
+                  projectDetails={project}
+                  key={project.address}
+                  Tezos={Tezos}
+                  userAddress={userAddress}
+                />
+              )
+          )}
       ,
       <AddProject Tezos={Tezos} open={open} handleClose={handleClose} />
     </div>

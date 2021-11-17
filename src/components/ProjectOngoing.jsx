@@ -128,14 +128,34 @@ function ProjectOngoing({ projectDetails, Tezos, userAddress }) {
           alignItems: "center",
         }}
       >
-        <Chip
-          style={{
-            backgroundColor: "#1976D2",
-            marginRight: "15px",
-            color: "white",
-          }}
-          label="Ongoing"
-        />
+        {new Date(projectDetails.data.endTime) > Date.now() ? (
+          <Chip
+            style={{
+              backgroundColor: "#1976D2",
+              marginRight: "15px",
+              color: "white",
+            }}
+            label="Ongoing"
+          />
+        ) : contractBalance >= projectDetails.data.goalAmount ? (
+          <Chip
+            style={{
+              backgroundColor: "#19D266",
+              marginRight: "15px",
+              color: "white",
+            }}
+            label="Ended"
+          />
+        ) : (
+          <Chip
+            style={{
+              backgroundColor: "#D21932",
+              marginRight: "15px",
+              color: "white",
+            }}
+            label="Failed"
+          />
+        )}
 
         <h2 style={{ margin: 0 }}>{projectDetails.data.name}</h2>
       </div>
