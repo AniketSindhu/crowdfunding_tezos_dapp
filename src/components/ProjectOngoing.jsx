@@ -15,6 +15,7 @@ function ProjectOngoing({ projectDetails, Tezos, userAddress }) {
   const [amountToFund, setAmountToFund] = useState(0);
   const [loading1, setLoading1] = useState(false);
   const [loading2, setLoading2] = useState(false);
+  const [loading3, setLoading3] = useState(false);
   const handleAmountToFundChange = (event) => {
     setAmountToFund(event.target.value);
   };
@@ -89,6 +90,41 @@ function ProjectOngoing({ projectDetails, Tezos, userAddress }) {
     });
   };
 
+  const claim = () => {
+    setLoading3(true);
+    Tezos.wallet.at(projectDetails.address).then((contract) => {
+      console.log(contract.entrypoints);
+      try {
+        contract.methods
+          .pay_off()
+          .send()
+          .then((op) => {
+            return op.confirmation();
+          })
+          .then((result) => {
+            if (result.completed) {
+              setLoading3(false);
+              axios
+                .get(config.API_URL_Project + projectDetails.address)
+                .then((response) => {
+                  setContractBalance(response.data.balance);
+                });
+              axios
+                .get(
+                  config.API_URL_Project + projectDetails.address + "/storage"
+                )
+                .then((response) => {
+                  setProjectFunding(response.data.funding);
+                });
+            }
+          });
+      } catch (e) {
+        console.log(e);
+        setLoading3(false);
+      }
+    });
+  };
+
   useEffect(() => {
     const getProjectInfo = () => {
       console.log(config.API_URL_Project + projectDetails.address + "/storage");
@@ -144,7 +180,7 @@ function ProjectOngoing({ projectDetails, Tezos, userAddress }) {
               marginRight: "15px",
               color: "white",
             }}
-            label="Ended"
+            label="Ended Successfully"
           />
         ) : (
           <Chip
@@ -171,22 +207,27 @@ function ProjectOngoing({ projectDetails, Tezos, userAddress }) {
       </div>
 
       <div style={{ display: "flex", flexDirection: "row" }}>
-        <input
-          type="text"
-          onChange={handleAmountToFundChange}
-          placeholder="Amount in Tez"
-          style={{ padding: "6px" }}
-        />
-        <LoadingButton
-          loading={loading1}
-          onClick={addFund}
-          variant="contained"
-          style={{
-            margin: "0px 10px 0px 10px",
-          }}
-        >
-          Fund Project
-        </LoadingButton>
+        {new Date(projectDetails.data.endTime) > Date.now() && (
+          <div>
+            <input
+              type="text"
+              onChange={handleAmountToFundChange}
+              placeholder="Amount in Tez"
+              style={{ padding: "6px" }}
+            />
+            <LoadingButton
+              loading={loading1}
+              onClick={addFund}
+              variant="contained"
+              style={{
+                margin: "0px 10px 0px 10px",
+              }}
+            >
+              Fund Project
+            </LoadingButton>
+          </div>
+        )}
+
         {fundingList && fundingList.hasOwnProperty(userAddress) && (
           <LoadingButton
             loading={loading2}
@@ -199,6 +240,21 @@ function ProjectOngoing({ projectDetails, Tezos, userAddress }) {
             Withdraw {fundingList[userAddress] / 10 ** 6} Tez
           </LoadingButton>
         )}
+
+        {projectDetails.data.owner === userAddress &&
+          contractBalance >= projectDetails.data.goalAmount &&
+          new Date(projectDetails.data.endTime) < Date.now() && (
+            <LoadingButton
+              loading={loading3}
+              onClick={claim}
+              variant="contained"
+              style={{
+                margin: "0px 10px 0px 10px",
+              }}
+            >
+              Claim Funds
+            </LoadingButton>
+          )}
       </div>
 
       <div
