@@ -11,7 +11,7 @@ import { Switch, FormControlLabel } from "@mui/material";
 
 function App() {
   const [Tezos, setTezos] = useState(
-    new TezosToolkit("https://granadanet.smartpy.io/")
+    new TezosToolkit("https://hangzhounet.smartpy.io/")
   );
   const [wallet, setWallet] = useState(null);
   const [userAddress, setUserAddress] = useState("");

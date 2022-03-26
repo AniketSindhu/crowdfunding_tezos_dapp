@@ -21,7 +21,7 @@ function ConnectButton({
       console.log("connecting wallet", wallet);
       await wallet.requestPermissions({
         network: {
-          type: "granadanet",
+          type: "hangzhounet",
         },
       });
       // gets user's address
@@ -41,11 +41,11 @@ function ConnectButton({
       const options = {
         name: "Crowdfunding Dapp",
         iconUrl: "https://tezostaquito.io/img/favicon.png",
-        preferredNetwork: "granadanet",
+        preferredNetwork: "hangzhounet",
       };
       const wallet = new BeaconWallet(options, {
         name: "Crowdfunding Dapp",
-        preferredNetwork: "granadanet",
+        preferredNetwork: "hangzhounet",
         disableDefaultEvents: true,
       });
       Tezos.setWalletProvider(wallet);
